@@ -10,17 +10,11 @@ namespace PassXYZ.Vault.Views;
 [XamlCompilation(XamlCompilationOptions.Compile)]
 public partial class SignUpPage : ContentPage
 {
-    LoginViewModel _viewModel;
+    private readonly LoginViewModel _viewModel;
 
-    public SignUpPage()
+    public SignUpPage(LoginViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = _viewModel = new LoginViewModel();
-    }
-
-    public SignUpPage(Action<string> signUpAction)
-    {
-        InitializeComponent();
-        BindingContext = _viewModel = new LoginViewModel(signUpAction);
+        BindingContext = _viewModel = viewModel;
     }
 }

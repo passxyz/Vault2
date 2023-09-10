@@ -1,55 +1,46 @@
-﻿using System.Diagnostics;
-
+﻿using System.Collections.ObjectModel;
 using PassXYZLib;
-
-using PassXYZ.Vault.Properties;
 using PassXYZ.Vault.ViewModels;
+using System.Diagnostics;
 
-namespace PassXYZ.Vault.Views;
-
-[XamlCompilation(XamlCompilationOptions.Compile)]
-public partial class LoginPage : ContentPage
+namespace PassXYZ.Vault.Views
 {
-    private readonly LoginViewModel _viewModel;
-
-    public LoginPage()
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class LoginPage : ContentPage
     {
-        InitializeComponent();
-        BindingContext = _viewModel = new LoginViewModel();
+        private readonly LoginViewModel _viewModel;
 
-        if (_viewModel.Users != null && _viewModel.Users.Count > 1)
+        private List<string> _users => User.GetUsersList();
+        public LoginPage(LoginViewModel viewModel)
         {
-            switchUsersButton.IsVisible = true;
-        }
-
-        if (DeviceInfo.Platform == DevicePlatform.iOS)
-        {
-            passwordEntry.ReturnType = ReturnType.Next;
-        }
-        else
-        {
-            passwordEntry.ReturnType = ReturnType.Done;
-            passwordEntry.Completed += (object sender, EventArgs e) =>
+            InitializeComponent();
+            BindingContext = _viewModel = viewModel;
+            if (_users != null && _users.Count > 1)
             {
-                _viewModel.OnLoginClicked();
-            };
-        }
-    }
-
-    private async void OnSwitchUsersClicked(object sender, EventArgs e)
-    {
-        if(_viewModel.Users != null)
-        {
-            var users = _viewModel.GetUsersList();
-            var username = await DisplayActionSheet(Properties.Resources.pt_id_switchusers, Properties.Resources.action_id_cancel, null, users.ToArray());
-            if (username != Properties.Resources.action_id_cancel)
-            {
-                messageLabel.Text = "";
-                _viewModel.CurrentUser.Username = usernameEntry.Text = username;
-                _viewModel.CurrentUser.Password = passwordEntry.Text = "";
-                // InitFingerPrintButton();
+                switchUsersButton.IsVisible = true;
             }
-            Debug.WriteLine($"LoginPage: OnSwitchUsersClicked(Username: {_viewModel.CurrentUser.Username})");
+        }
+
+        private async void OnSwitchUsersClicked(object sender, EventArgs e)
+        {
+            if (_users != null)
+            {
+                var username = await DisplayActionSheet(Properties.Resources.pt_id_switchusers, Properties.Resources.action_id_cancel, null, _users.ToArray());
+                if (username != Properties.Resources.action_id_cancel)
+                {
+                    messageLabel.Text = "";
+                    _viewModel.Username = usernameEntry.Text = username;
+                    _viewModel.Password = passwordEntry.Text = "";
+                }
+            }
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            _viewModel.Logout();
+            passwordEntry.Text = "";
+            _viewModel.CheckFingerprintStatus();
         }
     }
 }

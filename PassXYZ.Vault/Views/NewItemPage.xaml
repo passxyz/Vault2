@@ -4,7 +4,7 @@
              xmlns:resources="clr-namespace:PassXYZ.Vault.Properties"
              xmlns:styles="clr-namespace:PassXYZ.Vault.Resources.Styles"
              x:Class="PassXYZ.Vault.Views.NewItemPage"
-             Title="{Binding Title}">
+             Title="{Binding Name}">
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="{x:Static resources:Resources.action_id_cancel}" Command="{Binding CancelCommand}">
             <ToolbarItem.IconImageSource>
@@ -23,13 +23,13 @@
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </ContentPage.ToolbarItems>
-    
+
     <ContentPage.Content>
         <StackLayout Spacing="3" Padding="15">
             <Label Text="{x:Static resources:Resources.field_id_name}" FontSize="Medium" />
-            <Entry Text="{Binding Text, Mode=TwoWay}" FontSize="Medium" />
+            <Entry Text="{Binding Name, Mode=TwoWay}" FontSize="Medium" Placeholder="{Binding Placeholder}"/>
             <Label Text="{x:Static resources:Resources.field_id_notes}" FontSize="Medium" />
-            <Editor Text="{Binding Description, Mode=TwoWay}" AutoSize="TextChanges" FontSize="Medium" Margin="0" />
+            <Editor Text="{Binding Description, Mode=TwoWay}" AutoSize="TextChanges" FontSize="Medium" Margin="0" Placeholder="{Binding Placeholder}" />
         </StackLayout>
     </ContentPage.Content>
     

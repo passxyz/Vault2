@@ -1,55 +1,21 @@
-﻿using PassXYZ.Vault.Services;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using Microsoft.Maui.Controls;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-using KPCLib;
-using PassXYZLib;
-
-namespace PassXYZ.Vault.ViewModels;
-
-public class BaseViewModel : INotifyPropertyChanged
+namespace PassXYZ.Vault.ViewModels
 {
-    public static IDataStore<Item> DataStore => ServiceHelper.GetService<IDataStore<Item>>();
-
-    bool isBusy = false;
-    public bool IsBusy
+    public abstract partial class BaseViewModel : ObservableObject
     {
-        get { return isBusy; }
-        set { SetProperty(ref isBusy, value); }
+        [RelayCommand]
+        private void ItemSelectionChanged(object sender)
+        {
+            OnSelection(sender);
+        }
+
+        public abstract void OnSelection(object sender);
     }
-
-    string title = string.Empty;
-    public string Title
-    {
-        get { return title; }
-        set { SetProperty(ref title, value); }
-    }
-
-    #region INotifyPropertyChanged
-    protected bool SetProperty<T>(ref T backingStore, T value,
-        [CallerMemberName] string propertyName = "",
-        Action onChanged = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(backingStore, value))
-            return false;
-
-        backingStore = value;
-        onChanged?.Invoke();
-        OnPropertyChanged(propertyName);
-        return true;
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-    {
-        var changed = PropertyChanged;
-        if (changed == null)
-            return;
-
-        changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-    #endregion
 }

@@ -1,15 +1,15 @@
 ﻿using KPCLib;
-using PassXYZLib;
 using PassXYZ.Vault.ViewModels;
 
 namespace PassXYZ.Vault.Views
 {
     public partial class NewItemPage : ContentPage
     {
-        public NewItemPage()
+        public NewItemPage(NewItemViewModel viewModel)
         {
             InitializeComponent();
-            BindingContext = new NewItemViewModel();
+            if(viewModel == null ) { throw new ArgumentNullException(nameof(viewModel)); }
+            BindingContext = viewModel;
         }
     }
 }

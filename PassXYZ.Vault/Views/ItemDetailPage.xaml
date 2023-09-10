@@ -4,8 +4,11 @@
              xmlns:resources="clr-namespace:PassXYZ.Vault.Properties"
              xmlns:styles="clr-namespace:PassXYZ.Vault.Resources.Styles"
              x:Class="PassXYZ.Vault.Views.ItemDetailPage"
+             xmlns:template="clr-namespace:PassXYZ.Vault.Views.Templates"
              xmlns:local="clr-namespace:PassXYZ.Vault.ViewModels"
-             xmlns:model="clr-namespace:KPCLib;assembly=KPCLib"  
+             xmlns:model="clr-namespace:KPCLib;assembly=KPCLib"
+             xmlns:vw="clr-namespace:PassXYZ.Vault.Views"
+             x:Name="itemDetailPage"
              x:DataType="local:ItemDetailViewModel"
              Title="{Binding Title}">
 
@@ -27,80 +30,32 @@
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </ContentPage.ToolbarItems>
-    
-    <StackLayout>
-        <ListView x:Name="FieldsListView" 
-                  ItemsSource="{Binding Fields}"
-                  VerticalOptions="FillAndExpand"
-                  HasUnevenRows="False"
-                  RowHeight="84"
-                  IsPullToRefreshEnabled="true"
-                  IsRefreshing="{Binding IsBusy, Mode=OneWay}"
-                  CachingStrategy="RetainElement">
 
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ViewCell BindingContextChanged="OnBindingContextChanged">
-                        <ViewCell.ContextActions>
-                            <MenuItem Clicked="OnMenuCopyAsync" CommandParameter="{Binding .}"
-                                      Text="{x:Static resources:Resources.action_id_copy}" />
-                            <MenuItem Clicked="OnMenuEdit" CommandParameter="{Binding .}" 
-                                      Text="{x:Static resources:Resources.action_id_edit}" />
-                            <MenuItem Clicked="OnMenuDeleteAsync" CommandParameter="{Binding .}"
-                                      Text="{x:Static resources:Resources.action_id_delete}" IsDestructive="True" />
-                            <MenuItem Clicked="OnMenuShow" CommandParameter="{Binding .}" 
-                                      Text="{x:Static resources:Resources.action_id_show}" />
-                        </ViewCell.ContextActions>
+    <ScrollView>
+        <StackLayout>
+            <ListView x:Name="FieldsListView" 
+                      ItemsSource="{Binding Fields}"
+                      VerticalOptions="Fill"
+                      HasUnevenRows="False"
+                      RowHeight="84"
+                      IsPullToRefreshEnabled="true"
+                      IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+                      CachingStrategy="RetainElement">
 
-                        <StackLayout Padding="10" Orientation="Horizontal" x:DataType="model:Field" >
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="32" />
-                                    <RowDefinition Height="32" />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Grid Grid.RowSpan="2" Padding="10">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="32" />
-                                    </Grid.ColumnDefinitions>
-                                    <Image Grid.Column="0" Source="{Binding ImgSource}" HorizontalOptions="Fill" VerticalOptions="Fill" />
-                                </Grid>
-                                <Label Text="{Binding Key}"  Grid.Column="1"
-                                LineBreakMode="NoWrap" 
-                                MaxLines="1"
-                                Style="{DynamicResource ListItemTextStyle}"
-                                FontAttributes="Bold"
-                                FontSize="Small" />
-                                <Label Text="{Binding Value}"  Grid.Row="1" Grid.Column="1"
-                                LineBreakMode="TailTruncation"
-                                MaxLines="1"
-                                Style="{DynamicResource ListItemDetailTextStyle}"
-                                FontSize="Small" />
-                            </Grid>
-                            <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer 
-                                    NumberOfTapsRequired="1"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type local:ItemDetailViewModel}}, Path=FieldTapped}"
-                                    CommandParameter="{Binding .}">
-                                </TapGestureRecognizer>
-                            </StackLayout.GestureRecognizers>
-                        </StackLayout>
-
-                    </ViewCell>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-            <ListView.Footer>
-                <StackLayout Padding="5" Orientation="Horizontal">
-                    <Label Text="{Binding Description}" 
-                           FontSize="Small" 
-                           TextType ="Html"
-                           Style="{DynamicResource ListItemDetailTextStyle}" />
-                </StackLayout>
-            </ListView.Footer>
-        </ListView>
-    </StackLayout>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="model:Field">
+                        <template:FieldViewCell Key="{Binding Key}" 
+                                            Value="{Binding Value}" Source="{Binding ImgSource}" 
+                                            ParentPage="{x:Reference itemDetailPage}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Label Text="{Binding Description}"  
+                   VerticalOptions="End"
+                   FontSize="Small" 
+                   TextType ="Html"
+                   Style="{DynamicResource ListItemDetailTextStyle}" />
+        </StackLayout>
+    </ScrollView>
 
 </ContentPage>
