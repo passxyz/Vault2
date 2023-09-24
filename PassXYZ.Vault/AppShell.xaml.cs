@@ -1,7 +1,7 @@
 using System.Diagnostics;
 
 using PassXYZ.Vault.Views;
-using PassXYZ.Vault.Services;
+using PassXYZ.Vault.ViewModels;
 
 namespace PassXYZ.Vault;
 
@@ -14,9 +14,9 @@ public partial class AppShell : Shell
         InitializeComponent();
 
         Routing.RegisterRoute(nameof(ItemDetailPage), typeof(ItemDetailPage));
-        //Routing.RegisterRoute(nameof(NotesPage), typeof(NotesPage));
+        Routing.RegisterRoute(nameof(NotesPage), typeof(NotesPage));
         Routing.RegisterRoute(nameof(NewItemPage), typeof(NewItemPage));
-        //Routing.RegisterRoute(nameof(SignUpPage), typeof(SignUpPage));
+        Routing.RegisterRoute(nameof(SignUpPage), typeof(SignUpPage));
         Routing.RegisterRoute(nameof(LoginPage), typeof(LoginPage));
         //Routing.RegisterRoute(nameof(SearchPage), typeof(SearchPage));
         Routing.RegisterRoute(nameof(ItemsPage), typeof(ItemsPage));
@@ -28,9 +28,6 @@ public partial class AppShell : Shell
     /// </summary>
     private async void OnMenuItemClicked(object sender, EventArgs e)
     {
-        Debug.WriteLine("AppShell: Logout");
-        LoginUser.Instance.Logout();
-
         await Current.GoToAsync("//LoginPage");
     }
 

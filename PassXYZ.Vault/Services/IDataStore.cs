@@ -1,36 +1,18 @@
-﻿using System.Collections.ObjectModel;
-using Microsoft.Maui.Controls;
+﻿using PassXYZLib;
 
-using PassXYZLib;
-
-namespace PassXYZ.Vault.Services;
-
-public interface IDataStore<T>
+namespace PassXYZ.Vault.Services
 {
-    #region DS_misc
-    T CurrentGroup { get; set; }
-    string CurrentPath { get; }
-    T RootGroup { get; }
-    bool IsOpen { get; }
-    string GetStoreName();
-    DateTime GetStoreModifiedTime();
-    Task<bool> MergeAsync(string path);
-    // Methods to handle icons
-    ObservableCollection<PxIcon> GetCustomIcons(string? searchText = null);
-    Task<bool> DeleteCustomIconAsync(PxIcon icon);
-    ImageSource GetBuiltInImage(PxIcon icon);
-    #endregion
-
-    #region DS_Item
-    T? CreateNewItem(ItemSubType type);
-    T? GetItem(string id, bool SearchRecursive = false);
-    Task<T?> GetItemAsync(string id, bool SearchRecursive = false);
-    Task AddItemAsync(T item);
-    Task UpdateItemAsync(T item);
-    Task<bool> DeleteItemAsync(string id);
-    Task<IEnumerable<T>> GetItemsAsync(bool forceRefresh = false);
-    Task<IEnumerable<T>> GetOtpEntryListAsync();
-    Task<IEnumerable<T>> SearchEntriesAsync(string strSearch, T itemGroup);
-    #endregion
-    
+    public interface IDataStore<T>
+    {
+        Task<bool> AddItemAsync(T item);
+        Task<bool> UpdateItemAsync(T item);
+        Task<bool> DeleteItemAsync(string id);
+        T? GetItem(string id);
+        Task<IEnumerable<T>> GetItemsAsync(bool forceRefresh = false);
+        string SetCurrentGroup(T? group = default);
+        Task<bool> ConnectAsync(User user);
+        Task SignUpAsync(User user);
+        void Close();
+        T? CreateNewItem(ItemSubType type);
+    }
 }
