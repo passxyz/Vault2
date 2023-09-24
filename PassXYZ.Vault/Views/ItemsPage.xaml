@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PassXYZ.Vault.Views.ItemsPage"
+             Title="{Binding Title}"
+             xmlns:local="clr-namespace:PassXYZ.Vault.ViewModels"
+             xmlns:style="clr-namespace:PassXYZ.Vault.Resources.Styles"
+             xmlns:template="clr-namespace:PassXYZ.Vault.Views.Templates"
+             xmlns:model="clr-namespace:KPCLib;assembly=KPCLib"  
+             x:DataType="local:ItemsViewModel"
+             x:Name="itemsPage">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Add" Command="{Binding AddItemCommand}" 
+                     IconImageSource="{FontImage FontFamily=FontAwesomeSolid, Color=White, 
+                     Glyph={x:Static style:FontAwesomeSolid.PlusCircle}}"/>
+    </ContentPage.ToolbarItems>
+
+    <RefreshView Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+        <ListView x:Name="itemsListView"
+                  ItemsSource="{Binding Items}"
+                  VerticalOptions="FillAndExpand"
+                  HasUnevenRows="False"
+                  RowHeight="84">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="model:Item">
+                    <template:ItemViewCell Key="{Binding Name}" 
+                                           Value="{Binding Description}" Source="{Binding ImgSource}"
+                                           ParentPage="{x:Reference itemsPage}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </RefreshView>
+</ContentPage>

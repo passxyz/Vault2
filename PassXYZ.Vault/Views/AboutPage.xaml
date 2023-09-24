@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PassXYZ.Vault.Views.AboutPage"
+             xmlns:resources="clr-namespace:PassXYZ.Vault.Properties"
+             Title="{Binding Title}">
+    
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Accent">#96d1ff</Color>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <StackLayout Margin="20">
+            <StackLayout Padding="10" >
+                <Label FontFamily="FontAwesomeSolid" Text="&#xf00f;" 
+                       FontSize="128" TextColor="{StaticResource Primary}" 
+                       Margin="40"
+                       HorizontalTextAlignment="Center"/>
+                <Label HorizontalOptions="Center" Text="{x:Static resources:Resources.Appname}" FontAttributes="Bold" FontSize="22" />
+                <Label x:Name="AppVersion" HorizontalOptions="Center" FontSize="Small" />
+
+                <Grid HorizontalOptions="Center" Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <!-- Row 1 (Database Name) -->
+                    <Label HorizontalOptions="End" FontSize="Small" Text="{x:Static resources:Resources.database_name}" FontAttributes="Bold" Grid.Row="0" Grid.Column="0"/>
+                    <Label HorizontalOptions="Start" Padding="10,0,0,0" FontSize="Small" x:Name="DatabaseName" Grid.Row="0" Grid.Column="1" />
+                    <!-- Row 2 (Last Modified Date) -->
+                    <Label HorizontalOptions="End" FontSize="Small" Text="{x:Static resources:Resources.database_modified_date}" FontAttributes="Bold" Grid.Row="1" Grid.Column="0" />
+                    <Label HorizontalOptions="Start" Padding="10,0,0,0" FontSize="Small" x:Name="LastModifiedDate" Grid.Row="1" Grid.Column="1" />
+                    <!-- Row 3 (Last Modified Time) -->
+                    <Label HorizontalOptions="End" FontSize="Small" Text="{x:Static resources:Resources.database_modified_time}" FontAttributes="Bold" Grid.Row="2" Grid.Column="0" />
+                    <Label HorizontalOptions="Start" Padding="10,0,0,0" FontSize="Small" x:Name="LastModifiedTime" Grid.Row="2" Grid.Column="1" />
+                </Grid>
+
+                <StackLayout Margin="20">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Label></Label>
+                        <!-- Row 1 (Website info) -->
+                        <StackLayout Spacing="10" Grid.Row="0">
+                            <Label Text="{x:Static resources:Resources.about_passxyz_web}"/>
+                            <Button Margin="0,10,0,10" Text="{x:Static resources:Resources.about_learn_more}" 
+                                    Command="{Binding OpenWebCommand}" 
+                                    BackgroundColor="{StaticResource Primary}" TextColor="White" />
+                        </StackLayout>
+                        <!-- Row 2 (Copyright) -->
+                        <StackLayout Spacing="10" Grid.Row="1">
+                            <Label x:Name="copyright" Text="{x:Static resources:Resources.about_passxyz_copyright}" />
+                            <Label x:Name="license" Text="{x:Static resources:Resources.about_passxyz_license}" />
+                            <Label x:Name="url" Text="https://www.gnu.org/licenses/gpl-3.0.en.html" />
+                            <Label Text="{x:Static resources:Resources.about_acknowledgement}" FontAttributes="Bold" />
+                            <Label Text="{x:Static resources:Resources.about_keepass}" />
+                            <Label Text="https://keepass.info/" />
+                            <Label Text="{x:Static resources:Resources.about_kpclib}" />
+                            <Label Text="https://github.com/passxyz/KPCLib" />
+                        </StackLayout>
+                    </Grid>
+                </StackLayout>
+            </StackLayout>
+        </StackLayout>
+    </ScrollView>
+
+</ContentPage>
