@@ -40,17 +40,6 @@
     <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
   </PropertyGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)'=='net7.0-ios' and '$(Configuration)' == 'Release'">
-	  <ProvisioningType>manual</ProvisioningType>
-	  <CodesignKey>iPhone Distribution: Shugao Ye (W9WL9WPD24)</CodesignKey>
-	  <CodesignProvision>passxyz_2023</CodesignProvision>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(TargetFramework)'=='net7.0-ios'">
-	  <CodesignKey>Apple Development: Created via API (3GY4863L5R)</CodesignKey>
-	  <CodesignProvision>VS: com.passxyz.vault2 Development</CodesignProvision>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
