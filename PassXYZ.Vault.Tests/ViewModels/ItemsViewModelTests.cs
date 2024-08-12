@@ -28,7 +28,7 @@ namespace PassXYZ.Vault.Tests.ViewModels
             shell.Items.Add(abougPage);
 
             Application app = Substitute.For<Application>();
-            app.MainPage = shell;
+            //app.MainPage = shell;
 
             using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
                 builder.AddConsole()
