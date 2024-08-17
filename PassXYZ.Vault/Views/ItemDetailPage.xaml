@@ -42,7 +42,7 @@
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="model:Field">
                         <template:FieldViewCell Key="{Binding Key}" 
-                                            Value="{Binding Value}" Source="{Binding ImgSource}" 
+                                            Value="{Binding Value}" ItemIcon="{Binding ImgSource}" 
                                             ParentPage="{x:Reference itemDetailPage}"/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
