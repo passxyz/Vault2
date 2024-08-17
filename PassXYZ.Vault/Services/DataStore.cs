@@ -143,9 +143,16 @@ public class DataStore : IDataStore<Item>
 
         Item? oldItem = Items.Where((Item arg) => arg.Id == id).FirstOrDefault();
 
-        if (oldItem != null)
+        if (oldItem != null && Items.Remove(oldItem))
         {
-            Items.Remove(oldItem);
+            if (oldItem.IsGroup)
+            {
+                _db.DeleteGroup(oldItem as PwGroup);
+            }
+            else
+            {
+                _db.DeleteEntry(oldItem as PwEntry);
+            }
             await _db.SaveAsync();
             return await Task.FromResult(true);
         }
