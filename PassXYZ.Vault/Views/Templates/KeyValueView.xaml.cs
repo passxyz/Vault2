@@ -64,8 +64,8 @@ public partial class KeyValueView : ViewCell
         }
     }
 
-    public static readonly BindableProperty SourceProperty =
-        BindableProperty.Create(nameof(Source), typeof(ImageSource), typeof(KeyValueView), default!,
+    public static readonly BindableProperty ItemIconProperty =
+        BindableProperty.Create(nameof(ItemIcon), typeof(ImageSource), typeof(KeyValueView), default!,
             propertyChanging: (bindable, oldValue, newValue) =>
             {
                 var control = bindable as KeyValueView;
@@ -73,15 +73,15 @@ public partial class KeyValueView : ViewCell
                 var changingTo = newValue as ImageSource;
                 if (control == null) { throw new NullReferenceException(nameof(control)); }
                 if (changingTo == null) { throw new NullReferenceException(nameof(changingTo)); }
-                control.Source = changingTo;
+                control.ItemIcon = changingTo;
             });
-    public ImageSource Source 
+    public ImageSource ItemIcon
     {
-        get { return (ImageSource)GetValue(SourceProperty); }
+        get { return (ImageSource)GetValue(ItemIconProperty); }
         set
         {
             imageField.Source = value;
-            SetValue(SourceProperty, value);
+            SetValue(ItemIconProperty, value);
         }
     }
 
