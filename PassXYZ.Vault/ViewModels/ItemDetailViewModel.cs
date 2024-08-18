@@ -27,6 +27,7 @@ public partial class ItemDetailViewModel : BaseViewModel
         this.dataStore = dataStore;
         this.logger = logger;
         Fields = new ObservableCollection<Field>();
+        IsBusy = false;
     }
 
     [ObservableProperty]

@@ -83,9 +83,8 @@ namespace PassXYZ.Vault.ViewModels
             }
         }
 
-        public override async void OnSelection(object sender)
+        private async Task GoToPage(Item item)
         {
-            Item? item = sender as Item;
             if (item == null)
             {
                 logger.LogWarning("item is null.");
@@ -98,15 +97,33 @@ namespace PassXYZ.Vault.ViewModels
             }
             else
             {
-                if (item.IsNotes()) 
+                if (item.IsNotes())
                 {
                     await Shell.Current.GoToAsync($"{nameof(NotesPage)}?{nameof(ItemDetailViewModel.ItemId)}={item.Id}");
                 }
-                else 
+                else
                 {
                     await Shell.Current.GoToAsync($"{nameof(ItemDetailPage)}?{nameof(ItemDetailViewModel.ItemId)}={item.Id}");
                 }
             }
+        }
+
+        public override void OnSelection(object sender)
+        {
+            Item? item = sender as Item;
+            SelectedItem = item;
+        }
+
+        public async void OnItemSelected(Item item)
+        {
+            if (item == null)
+            {
+                return;
+            }
+
+            logger.LogDebug($"OnItemSelected is called and the item is {item.Name}");
+            //SelectedItem = item;
+            await GoToPage(item);
         }
 
         /// <summary>
@@ -212,10 +229,14 @@ namespace PassXYZ.Vault.ViewModels
             }
             else
             {
-                Title = dataStore.SetCurrentGroup(SelectedItem);
+                if (SelectedItem.IsGroup) 
+                {
+                    Title = dataStore.SetCurrentGroup(SelectedItem);
+                }
             }
             // load items
             IsBusy = true;
+            logger.LogDebug($"Loading and set IsBusy={IsBusy}");
         }
     }
 }

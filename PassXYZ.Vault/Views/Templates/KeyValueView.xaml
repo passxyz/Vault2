@@ -40,12 +40,12 @@
                MaxLines="1"
                Style="{DynamicResource ListItemDetailTextStyle}"
                FontSize="Small" />
-        <Grid.GestureRecognizers>
+        <!--<Grid.GestureRecognizers>
             <TapGestureRecognizer 
                 NumberOfTapsRequired="1"
                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:BaseViewModel}}, Path=ItemSelectionChangedCommand}"
                 CommandParameter="{Binding .}">
             </TapGestureRecognizer>
-        </Grid.GestureRecognizers>
+        </Grid.GestureRecognizers>-->
     </Grid>
 </ViewCell>

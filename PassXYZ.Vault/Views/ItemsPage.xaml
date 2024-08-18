@@ -21,6 +21,7 @@
             <ListView x:Name="itemsListView"
                   ItemsSource="{Binding Items}"
                   VerticalOptions="FillAndExpand"
+                  ItemTapped="OnTap"
                   HasUnevenRows="False"
                   RowHeight="84">
                 <ListView.ItemTemplate>

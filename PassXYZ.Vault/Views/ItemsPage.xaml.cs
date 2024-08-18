@@ -20,4 +20,13 @@ public partial class ItemsPage : ContentPage
         base.OnAppearing();
         viewModel.OnAppearing();
     }
+    void OnTap(object sender, ItemTappedEventArgs args)
+    {
+        var item = args.Item as Item;
+        if (item == null)
+        {
+            return;
+        }
+        viewModel.OnItemSelected(item);
+    }
 }
