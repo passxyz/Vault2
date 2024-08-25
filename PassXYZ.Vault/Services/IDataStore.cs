@@ -22,5 +22,6 @@ namespace PassXYZ.Vault.Services
         Task<bool> DeleteCustomIconAsync(PwUuid uuidIcon);
         ImageSource GetBuiltInImage(PwUuid uuid);
         Task<bool> ChangeMasterPassword(string newPassword);
+        Task<IEnumerable<PxEntry>> GetOtpEntryListAsync();
     }
 }

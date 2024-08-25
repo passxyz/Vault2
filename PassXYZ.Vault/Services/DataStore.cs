@@ -373,4 +373,9 @@ public class DataStore : IDataStore<Item>
         }
         return result;
     }
+
+    public async Task<IEnumerable<PxEntry>> GetOtpEntryListAsync()
+    {
+        return await Task.Run(() => { return _db.GetOtpEntryList(); });
+    }
 }
