@@ -5,14 +5,9 @@ using SkiaSharp;
 
 using KeePassLib;
 using KPCLib;
-using KeePassLib.Collections;
-using KeePassLib.Keys;
 using KeePassLib.Security;
-using KeePassLib.Serialization;
 using PassXYZLib;
 
-using PassXYZ.Vault.Properties;
-using Newtonsoft.Json.Linq;
 
 namespace PassXYZ.Vault.Services;
 
@@ -65,6 +60,7 @@ public class DataStore : IDataStore<Item>
 {
     private readonly PasswordDb _db = default!;
     private PwGroup? _currentGroup = null;
+    private User? _user = default;
 
     public DataStore()
     {
@@ -200,6 +196,7 @@ public class DataStore : IDataStore<Item>
             if (_db.IsOpen)
             {
                 _db.CurrentGroup = _db.RootGroup;
+                _user = user;
             }
             return _db.IsOpen;
         });
@@ -282,5 +279,98 @@ public class DataStore : IDataStore<Item>
             newItem = entry;
         }
         return newItem;
+    }
+
+    /// <summary>
+    /// Search entries with a keyword
+    /// </summary>
+    /// <param name="strSearch">keyword to be searched. If it is null, all items will be returned.</param>
+    /// <param name="itemGroup">If it is not null, this group is searched</param>
+    /// <returns>a list of entries</returns>
+    public async Task<IEnumerable<Item>> SearchEntriesAsync(string? strSearch = null, Item? itemGroup = null)
+    {
+        return await Task.Run(() => { return _db.SearchEntries(strSearch, itemGroup); });
+    }
+
+    /// <summary>
+    /// Delete a custom icon by uuid.
+    /// </summary>
+    /// <param name="uuid">uuid of the custom icon</param>
+    /// <returns>success or failure</returns>
+    public async Task<bool> DeleteCustomIconAsync(PwUuid uuidIcon)
+    {
+        List<PwUuid> vUuidsToDelete = new List<PwUuid>();
+
+        if (uuidIcon == null) { return false; }
+        vUuidsToDelete.Add(uuidIcon);
+        bool result = _db.DeleteCustomIcons(vUuidsToDelete);
+        if (result)
+        {
+            // Save the database to take effect
+            await _db.SaveAsync();
+
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Get the image source from the custom icon in the database
+    /// </summary>
+    /// <param name="uuid">UUID of custom icon</param>
+    /// <returns>ImageSource or null</returns>
+    public ImageSource? GetBuiltInImage(PwUuid uuid)
+    {
+        PwCustomIcon customIcon = _db.GetPwCustomIcon(uuid);
+        if (customIcon != null)
+        {
+            byte[] pb = customIcon.ImageDataPng;
+            SKBitmap bitmap = PxItem.LoadImage(pb);
+            return PxItem.GetImageSource(bitmap);
+        }
+        return null;
+    }
+
+    private PxIcon GetPxIcon(PwCustomIcon pwci) 
+    { 
+        return new PxIcon
+        {
+            IconType = PxIconType.PxEmbeddedIcon,
+            Uuid = pwci.Uuid,
+            Name = pwci.Name,
+            ImgSource = GetBuiltInImage(pwci.Uuid),
+        };
+    }
+
+    public ObservableCollection<PxIcon> GetIcons(string? searchText = null)
+    {
+        ObservableCollection<PxIcon> icons = new ObservableCollection<PxIcon>();
+        List<PwCustomIcon> customIconList = _db.CustomIcons;
+        foreach (PwCustomIcon pwci in customIconList)
+        {
+            if (searchText == null) 
+            {
+                icons.Add(GetPxIcon(pwci));
+            }
+            else
+            {
+                if (pwci.Name.Contains(searchText)) 
+                {
+                    icons.Add(GetPxIcon(pwci));
+                }
+            }
+        }
+        return icons;
+    }
+
+    public async Task<bool> ChangeMasterPassword(string newPassword)
+    {
+        bool result = _db.ChangeMasterPassword(newPassword, _user);
+        if (result)
+        {
+            _db.MasterKeyChanged = DateTime.UtcNow;
+            // Save the database to take effect
+            await _db.SaveAsync();
+        }
+        return result;
     }
 }

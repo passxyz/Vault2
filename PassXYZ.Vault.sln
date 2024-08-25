@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PassXYZ.Vault", "PassXYZ.Va
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PassXYZLib", "..\PassXYZLib\PassXYZLib\PassXYZLib.csproj", "{F91E5CBF-C49F-434A-A13E-C1B93CF30272}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PassXYZ.Vault.Tests", "PassXYZ.Vault.Tests\PassXYZ.Vault.Tests.csproj", "{2F5444F7-2135-49F3-AECA-79BDEF2114E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{F91E5CBF-C49F-434A-A13E-C1B93CF30272}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F91E5CBF-C49F-434A-A13E-C1B93CF30272}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F91E5CBF-C49F-434A-A13E-C1B93CF30272}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F5444F7-2135-49F3-AECA-79BDEF2114E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F5444F7-2135-49F3-AECA-79BDEF2114E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F5444F7-2135-49F3-AECA-79BDEF2114E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F5444F7-2135-49F3-AECA-79BDEF2114E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

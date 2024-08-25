@@ -1,4 +1,7 @@
-﻿using PassXYZLib;
+﻿using KeePassLib;
+using KPCLib;
+using PassXYZLib;
+using System.Collections.ObjectModel;
 
 namespace PassXYZ.Vault.Services
 {
@@ -14,5 +17,10 @@ namespace PassXYZ.Vault.Services
         Task SignUpAsync(User user);
         void Close();
         T? CreateNewItem(ItemSubType type);
+        Task<IEnumerable<Item>> SearchEntriesAsync(string? strSearch = null, Item? itemGroup = null);
+        ObservableCollection<PxIcon> GetIcons(string? searchText = null);
+        Task<bool> DeleteCustomIconAsync(PwUuid uuidIcon);
+        ImageSource GetBuiltInImage(PwUuid uuid);
+        Task<bool> ChangeMasterPassword(string newPassword);
     }
 }

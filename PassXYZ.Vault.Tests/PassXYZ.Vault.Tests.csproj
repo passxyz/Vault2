@@ -25,10 +25,10 @@
     </PackageReference>
     <PackageReference Include="NSubstitute" Version="5.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
-    <PackageReference Include="PassXYZLib" Version="2.1.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\PassXYZLib\PassXYZLib\PassXYZLib.csproj" />
     <ProjectReference Include="..\PassXYZ.Vault\PassXYZ.Vault.csproj" />
   </ItemGroup>
 

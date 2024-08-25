@@ -1,6 +1,8 @@
 ﻿using KPCLib;
 using PassXYZ.Vault.Services;
 using PassXYZLib;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace PassXYZ.Vault.Tests.Services
 {
@@ -25,7 +27,7 @@ namespace PassXYZ.Vault.Tests.Services
         }
 
         [Fact]
-        public async void GetItemsAsyncTest() 
+        public async Task GetItemsAsyncTest() 
         {
             bool result = await dataStore.ConnectAsync(_user);
             Assert.True(result);
@@ -36,7 +38,7 @@ namespace PassXYZ.Vault.Tests.Services
         }
 
         [Fact]
-        public async void AddGroupAsyncTest()
+        public async Task AddGroupAsyncTest()
         {
             bool result = await dataStore.ConnectAsync(_user);
             Assert.True(result);
@@ -52,7 +54,7 @@ namespace PassXYZ.Vault.Tests.Services
         }
 
         [Fact]
-        public async void AddEntryAsyncTest()
+        public async Task AddEntryAsyncTest()
         {
             bool result = await dataStore.ConnectAsync(_user);
             Assert.True(result);
@@ -68,7 +70,7 @@ namespace PassXYZ.Vault.Tests.Services
         }
 
         [Fact]
-        public async void AddItemAsyncFailureTest() 
+        public async Task AddItemAsyncFailureTest() 
         {
             bool result = false;
 #pragma warning disable CS8625 // Possible null reference argument.
@@ -78,7 +80,7 @@ namespace PassXYZ.Vault.Tests.Services
         }
 
         [Fact]
-        public async void UpdateItemAsyncTest()
+        public async Task UpdateItemAsyncTest()
         {
             bool result = await dataStore.ConnectAsync(_user);
             Assert.True(result);
@@ -97,7 +99,7 @@ namespace PassXYZ.Vault.Tests.Services
         }
 
         [Fact]
-        public async void UpdateNullItemAsyncTest() 
+        public async Task UpdateNullItemAsyncTest() 
         {
             bool result = false;
 #pragma warning disable CS8625 // Possible null reference argument.
@@ -107,7 +109,7 @@ namespace PassXYZ.Vault.Tests.Services
         }
 
         [Fact]
-        public async void UpdateNoExistItemAsyncTest() 
+        public async Task UpdateNoExistItemAsyncTest() 
         {
             bool result = await dataStore.ConnectAsync(_user);
             Assert.True(result);
@@ -123,7 +125,7 @@ namespace PassXYZ.Vault.Tests.Services
         }
 
         [Fact]
-        public async void DeleteItemAsyncTest()
+        public async Task DeleteItemAsyncTest()
         {
             bool result = await dataStore.ConnectAsync(_user);
             Assert.True(result);
@@ -141,7 +143,7 @@ namespace PassXYZ.Vault.Tests.Services
         }
 
         [Fact]
-        public async void DeleteNullItemAsyncTest()
+        public async Task DeleteNullItemAsyncTest()
         {
             bool result = false;
 #pragma warning disable CS8625 // Possible null reference argument.
@@ -151,7 +153,7 @@ namespace PassXYZ.Vault.Tests.Services
         }
 
         [Fact]
-        public async void DeleteNoExistItemAsyncTest()
+        public async Task DeleteNoExistItemAsyncTest()
         {
             bool result = await dataStore.ConnectAsync(_user);
             Assert.True(result);
@@ -167,7 +169,7 @@ namespace PassXYZ.Vault.Tests.Services
         }
 
         [Fact]
-        public async void GetItemAsyncTest()
+        public async Task GetItemAsyncTest()
         {
             bool result = await dataStore.ConnectAsync(_user);
             Assert.True(result);
@@ -186,7 +188,7 @@ namespace PassXYZ.Vault.Tests.Services
         }
 
         [Fact]
-        public async void GetNullItemAsyncTest()
+        public async Task GetNullItemAsyncTest()
         {
             bool result = await dataStore.ConnectAsync(_user);
             Assert.True(result);
@@ -199,7 +201,7 @@ namespace PassXYZ.Vault.Tests.Services
         }
 
         [Fact]
-        public async void GetNoExistItemAsyncTest()
+        public async Task GetNoExistItemAsyncTest()
         {
             bool result = await dataStore.ConnectAsync(_user);
             Assert.True(result);
@@ -212,6 +214,58 @@ namespace PassXYZ.Vault.Tests.Services
             };
             var item = dataStore.GetItem(newItem.Id);
             Assert.Null(item);
+        }
+
+        /// <summary>
+        /// Search entries without a keyword
+        /// </summary>
+        [Fact]
+        public async Task SearchEntriesWithoutKeywordTest()
+        {
+            bool result = await dataStore.ConnectAsync(_user);
+            Assert.True(result);
+            var items = await dataStore.SearchEntriesAsync();
+            Assert.True((items.Count() > 10));
+            Debug.WriteLine($"Found {items.Count()} items");
+        }
+
+        /// <summary>
+        /// Search entries with a keyword
+        /// </summary>
+        [Theory]
+        [InlineData("Group")]
+        [InlineData("Test")]
+        public async Task SearchEntriesFoundKeywordTest(string keyword)
+        {
+            bool result = await dataStore.ConnectAsync(_user);
+            Assert.True(result);
+            var items = await dataStore.SearchEntriesAsync(keyword);
+            Assert.True((items.Count() > 0));
+            Debug.WriteLine($"Found {items.Count()} items");
+        }
+
+        /// <summary>
+        /// Search entries with a keyword
+        /// </summary>
+        [Theory]
+        [InlineData("ststem")]
+        [InlineData("c0nnect")]
+        public async Task SearchEntriesNoKeywordFoundTest(string keyword)
+        {
+            bool result = await dataStore.ConnectAsync(_user);
+            Assert.True(result);
+            var items = await dataStore.SearchEntriesAsync(keyword);
+            Assert.True((items.Count() == 0));
+            Debug.WriteLine($"Found {items.Count()} items");
+        }
+
+        [Fact]
+        public async Task GetIconsTest() 
+        {
+            bool result = await dataStore.ConnectAsync(_user);
+            Assert.True(result);
+            var icons = dataStore.GetIcons();
+            Debug.WriteLine($"{icons.Count}");
         }
     }
 }
