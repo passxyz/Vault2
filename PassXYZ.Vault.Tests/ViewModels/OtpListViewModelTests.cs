@@ -27,6 +27,7 @@ namespace PassXYZ.Vault.Tests.ViewModels
                 Username = "test1",
                 Password = "12345"
             };
+            logger.LogInformation("Start OtpListViewModel Tests");
         }
 
         [Fact]
@@ -38,6 +39,7 @@ namespace PassXYZ.Vault.Tests.ViewModels
             ICommand command = vm.GetOtpListCommand;
             command.Execute(null);
             System.Threading.Thread.Sleep(1000);
+            logger.LogDebug($"Found {vm.Entries.Count} OTP entries");
         }
 
         [Fact]

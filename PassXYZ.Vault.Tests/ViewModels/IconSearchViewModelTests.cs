@@ -27,6 +27,7 @@ namespace PassXYZ.Vault.Tests.ViewModels
                 Username = "test1",
                 Password = "12345"
             };
+            logger.LogInformation("Start IconSearchViewModel Tests");
         }
 
         [Fact]
