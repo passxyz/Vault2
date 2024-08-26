@@ -7,6 +7,7 @@ using KPCLib;
 using PassXYZLib;
 using PassXYZ.Vault.Services;
 using PassXYZ.Vault.Views;
+using System.Diagnostics;
 
 namespace PassXYZ.Vault.ViewModels
 {
@@ -187,6 +188,49 @@ namespace PassXYZ.Vault.ViewModels
                 IsBusy = false;
                 logger.LogDebug("Set IsBusy to false");
             }
+        }
+
+        [RelayCommand]
+        public async Task ExecuteSearch(string? strSearch)
+        {
+            try
+            {
+                Items.Clear();
+                var items = await dataStore.SearchEntriesAsync(strSearch, null);
+                foreach (Item entry in items)
+                {
+                    if (entry != null)
+                    {
+                        ImageSource imgSource = (ImageSource)entry.ImgSource;
+                        if (entry.ImgSource == null)
+                        {
+                            entry.SetIcon();
+                        }
+                        Items.Add(entry);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ItemsViewModel: ExecuteSearch, {ex}");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task LoadSearchItems()
+        {
+            await ExecuteSearch(null);
+        }
+
+        [RelayCommand]
+        private async Task Search()
+        {
+            await Shell.Current.GoToAsync($"{nameof(SearchPage)}");
+            Debug.WriteLine("ItemsViewModel: SearchCommand clicked");
         }
 
         public string ItemId
