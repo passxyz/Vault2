@@ -37,7 +37,7 @@
         <Label x:Name="valueField" Text=""
                Grid.Row="1" Grid.Column="1"
                LineBreakMode="TailTruncation"
-               MaxLines="1"
+               MaxLines="3"
                Style="{DynamicResource Value}"
                FontSize="Small" />
     </Grid>

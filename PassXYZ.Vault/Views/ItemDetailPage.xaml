@@ -31,33 +31,31 @@
         </ToolbarItem>
     </ContentPage.ToolbarItems>
 
-    <RefreshView IsRefreshing="{Binding IsBusy, Mode=OneWay}">
-        <ScrollView>
-            <ListView x:Name="FieldsListView" 
+    <StackLayout>
+        <ListView x:Name="FieldsListView" 
                       ItemsSource="{Binding Fields}"
                       VerticalOptions="FillAndExpand"
-                      HasUnevenRows="False"
-                      RowHeight="84">
+                      HasUnevenRows="True">
 
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="model:Field">
-                        <template:FieldViewCell Key="{Binding Key}" 
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="model:Field">
+                    <template:FieldViewCell Key="{Binding Key}" 
                                             Value="{Binding Value}" ItemIcon="{Binding ImgSource}" 
                                             ParentPage="{x:Reference itemDetailPage}"/>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
+                </DataTemplate>
+            </ListView.ItemTemplate>
 
-                <ListView.Header>
-                    <StackLayout BackgroundColor="LightGray">
-                        <Label Margin="10,0,0,0"
+            <ListView.Footer>
+                <StackLayout BackgroundColor="LightGray" Padding="5">
+                    <Label Margin="10,0,0,0"
                            Text="{Binding Description}"
                            FontSize="Small"
                            TextType ="Html"
-                           Style="{DynamicResource ListItemDetailTextStyle}" />
-                    </StackLayout>
-                </ListView.Header>
-            </ListView>
-        </ScrollView>
-    </RefreshView>
+                           Style="{DynamicResource Value}" />
+                </StackLayout>
+            </ListView.Footer>
+        </ListView>
+
+    </StackLayout>
 
 </ContentPage>
