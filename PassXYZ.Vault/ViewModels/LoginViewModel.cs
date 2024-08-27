@@ -281,5 +281,10 @@ namespace PassXYZ.Vault.ViewModels
 
             return result.Authenticated;
         }
+
+        public string GetDeviceLockData()
+        {
+            return PxDatabase.GetDeviceLockData(_currentUser);
+        }
     }
 }

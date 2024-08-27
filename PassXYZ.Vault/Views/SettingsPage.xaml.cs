@@ -27,14 +27,14 @@ public partial class SettingsPage : ContentPage
     private void SetFingerprintSwitcher()
     {
         FingerprintSwitcher.IsEnabled = _viewModel.IsFingerprintAvailable;
-        FingerprintSwitcher.On = _viewModel.IsFingerprintEnabled;
+        // FingerprintSwitcher.On<> = _viewModel.IsFingerprintEnabled;
         if (_viewModel.IsFingerprintAvailable)
         {
-            FingerprintSwitcher.Text = Properties.Resources.settings_fingerprint_remark;
+            FingerprintStatus.Text = Properties.Resources.settings_fingerprint_remark;
         }
         else
         {
-            FingerprintSwitcher.Text = Properties.Resources.settings_fingerprint_disabled;
+            FingerprintStatus.Text = Properties.Resources.settings_fingerprint_disabled;
         }
     }
 
@@ -42,7 +42,7 @@ public partial class SettingsPage : ContentPage
     {
         base.OnAppearing();
 
-        timerCell.Text = Properties.Resources.settings_timer_title + " " + PxUser.AppTimeout.ToString() + " " + Properties.Resources.settings_timer_unit_seconds;
+        timerField.Text = Properties.Resources.settings_timer_title + " " + PxUser.AppTimeout.ToString() + " " + Properties.Resources.settings_timer_unit_seconds;
 
         try
         {
@@ -79,7 +79,7 @@ public partial class SettingsPage : ContentPage
         else if (timerValue == timer_30minutes) { PxUser.AppTimeout = 1800; }
         else if (timerValue == timer_1hour) { PxUser.AppTimeout = 3600; }
 
-        timerCell.Text = Properties.Resources.settings_timer_title + " " + PxUser.AppTimeout.ToString() + " " + Properties.Resources.settings_timer_unit_seconds;
+        timerField.Text = Properties.Resources.settings_timer_title + " " + PxUser.AppTimeout.ToString() + " " + Properties.Resources.settings_timer_unit_seconds;
     }
 
 
@@ -100,7 +100,7 @@ public partial class SettingsPage : ContentPage
         }
         else
         {
-            FingerprintSwitcher.Text = "Turn on fingerprint error.";
+            FingerprintStatus.Text = "Turn on fingerprint error.";
         }
         SetFingerprintSwitcher();
     }
@@ -131,5 +131,12 @@ public partial class SettingsPage : ContentPage
             // Turn off fingerprint
             _ = await _currentUser.DisableSecurityAsync();
         }
+    }
+
+    private async void OnSecuritySettingsTappedAsync(object sender, System.EventArgs e) 
+    {
+        string msg = _viewModel.GetDeviceLockData();
+        var qrcodePage = new QrCodePage(msg, _currentUser.Username);
+        await Navigation.PushModalAsync(new NavigationPage(qrcodePage));
     }
 }
