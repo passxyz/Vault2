@@ -47,6 +47,8 @@ public static class MauiProgram
         builder.Services.AddTransient<ItemsViewModel>();
         builder.Services.AddTransient<ItemsPage>();
         builder.Services.AddTransient<SearchPage>();
+        builder.Services.AddSingleton<OtpListViewModel>();
+        builder.Services.AddSingleton<OtpListPage>();
 
         builder.Services.AddSingleton(typeof(IFingerprint), CrossFingerprint.Current);
 

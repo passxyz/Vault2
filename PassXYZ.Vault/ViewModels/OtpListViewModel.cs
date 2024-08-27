@@ -23,7 +23,7 @@ namespace PassXYZ.Vault.ViewModels
         {
             this.dataStore = dataStore;
             this.logger = logger;
-            Entries = new();
+            Entries = [];
         }
 
         [ObservableProperty]
@@ -46,7 +46,7 @@ namespace PassXYZ.Vault.ViewModels
         }
 
         [RelayCommand]
-        private async Task GetOtpList()
+        public async Task GetOtpList()
         {
             if (IsBusy) { return; }
 

@@ -31,6 +31,10 @@
         <ShellContent Route="RootPage" ContentTemplate="{DataTemplate local:ItemsPage}">
         </ShellContent>
     </FlyoutItem>
+    <FlyoutItem Title="OTP" Icon="{FontImage FontFamily=FontAwesomeSolid, Color=Black, 
+        Glyph={x:Static style:FontAwesomeSolid.Key}}">
+        <ShellContent Route="OtpListPage" ContentTemplate="{DataTemplate local:OtpListPage}" />
+    </FlyoutItem>
     <FlyoutItem Title="{x:Static res:Resources.menu_id_settings}" 
         Icon="{FontImage FontFamily=FontAwesomeSolid, Color=Black, 
         Glyph={x:Static style:FontAwesomeSolid.Cog}}">
