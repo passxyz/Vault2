@@ -6,6 +6,7 @@ using PassXYZ.Vault.Services;
 using PassXYZ.Vault.Views;
 using PassXYZ.Vault.ViewModels;
 using User = PassXYZLib.User;
+using Camera.MAUI;
 
 namespace PassXYZ.Vault;
 
@@ -16,7 +17,8 @@ public static class MauiProgram
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
-			.ConfigureFonts(fonts =>
+            .UseMauiCameraView()
+            .ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("fa-regular-400.ttf", "FontAwesomeRegular");
 				fonts.AddFont("fa-solid-900.ttf", "FontAwesomeSolid");

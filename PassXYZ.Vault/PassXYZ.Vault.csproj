@@ -126,13 +126,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Camera.MAUI.ZXing" Version="1.0.0" />
     <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
     <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="EJL.MauiHybridWebView" Version="1.0.0-preview4" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
     <PackageReference Include="Plugin.Fingerprint" Version="3.0.0-beta.1" />
-    <PackageReference Include="Camera.MAUI.ZXing" Version="1.0.0" />
+    <PackageReference Include="Camera.MAUI" Version="1.5.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -141,6 +142,9 @@
 
   <ItemGroup>
 	  <MauiXaml Update="Views\NotesPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\QrCodeScanPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\SignUpPage.xaml">

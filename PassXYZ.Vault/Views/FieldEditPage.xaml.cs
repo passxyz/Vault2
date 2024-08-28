@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 
+using Camera.MAUI;
 using PureOtp;
 using KPCLib;
-using PassXYZ.Vault.Properties;
-using PassXYZ.Vault.ViewModels;
+using PassXYZLib;
 
 namespace PassXYZ.Vault.Views
 {
-    [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class FieldEditPage : ContentPage
     {
         private Action<string, string, bool> _updateAction;
@@ -25,14 +19,14 @@ namespace PassXYZ.Vault.Views
             InitializeComponent();
 
             Title = keyField.Text = key;
-            if(!string.IsNullOrEmpty(key))
+            if (!string.IsNullOrEmpty(key))
             {
                 keyField.IsVisible = false;
                 // pwCheckBox.IsVisible = false;
                 optionGroup.IsVisible = false;
                 _isNewField = false;
             }
-            
+
             valueField.Text = value;
 
             _updateAction = updateAction;
@@ -85,7 +79,17 @@ namespace PassXYZ.Vault.Views
         {
             bool isProtected = pwCheckBox.IsChecked;
 
-            if(_isNewField)
+            if (otpCheckBox.IsChecked)
+            {
+                // If this is an OTP url, we need to valid it.
+                if (!isValidUrl(valueField.Text))
+                {
+                    await DisplayAlert("", Properties.Resources.error_message_invalid_url, Properties.Resources.alert_id_ok);
+                    return;
+                }
+            }
+
+            if (_isNewField)
             {
                 _updateAction?.Invoke(keyField.Text, valueField.Text, isProtected);
             }
@@ -101,19 +105,68 @@ namespace PassXYZ.Vault.Views
             _ = await Shell.Current.Navigation.PopAsync();
         }
 
-        private void OnPasswordCheckBoxChanged(object sender, CheckedChangedEventArgs e)
+        void HandleResult(BarcodeResult result)
+        {
+            Debug.WriteLine($"FieldEditPage: {result.Text}");
+
+            // Pop the page and show the result
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _ = await Navigation.PopAsync();
+                valueField.Text += result.Text;
+            });
+        }
+
+        private async void OnScanClicked(object sender, EventArgs e)
+        {
+            var scanPage = new QrCodeScanPage();
+            scanPage.OnScanResult += HandleResult;
+
+            await Navigation.PushAsync(scanPage);
+        }
+
+        private void OnOtpCheckBoxChanged(object sender, CheckedChangedEventArgs e)
         {
             if (e.Value)
             {
                 pwCheckBox.IsEnabled = false;
                 _checkboxColor = pwCheckBox.Color;
-                //pwCheckBox.Color = Color.Gray;
-                Debug.WriteLine("Password CheckBox is true.");
+                pwCheckBox.Color = Color.FromRgba(211, 311, 211, 255);
+                keyField.Text = PassXYZLib.PxDefs.PxCustomDataOtpUrl;
+                keyField.IsEnabled = false;
+                if(_dataEntry != null)
+                {
+                    if(_dataEntry is PxEntry pxEntry) 
+                    {
+                        valueField.Text = _dataEntry != null ? pxEntry.GetOtpUrl() : throw new ArgumentNullException("dataEntry");
+                    }
+                }
+                Debug.WriteLine("OTP CheckBox is true.");
             }
             else
             {
                 pwCheckBox.IsEnabled = true;
-                //pwCheckBox.Color = _checkboxColor;
+                pwCheckBox.Color = _checkboxColor;
+                keyField.Text = "";
+                keyField.IsEnabled = true;
+                valueField.Text = "";
+                Debug.WriteLine("OTP CheckBox is false.");
+            }
+        }
+
+        private void OnPasswordCheckBoxChanged(object sender, CheckedChangedEventArgs e)
+        {
+            if (e.Value)
+            {
+                otpCheckBox.IsEnabled = false;
+                _checkboxColor = otpCheckBox.Color;
+                otpCheckBox.Color = Color.FromRgba(211, 311, 211, 255);
+                Debug.WriteLine("Password CheckBox is true.");
+            }
+            else
+            {
+                otpCheckBox.IsEnabled = true;
+                otpCheckBox.Color = _checkboxColor;
                 Debug.WriteLine("Password CheckBox is false.");
             }
         }

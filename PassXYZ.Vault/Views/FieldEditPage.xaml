@@ -7,6 +7,14 @@
              Title="Field Edit">
 
     <ContentPage.ToolbarItems>
+        <ToolbarItem Text="{x:Static resources:Resources.action_id_scan}" Clicked="OnScanClicked">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource FontFamily="FontAwesomeRegular"
+			        Glyph="{x:Static styles:FontAwesomeRegular.Scan}"
+			        Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Secondary}}"
+			        Size="16" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
         <ToolbarItem Text="{x:Static resources:Resources.action_id_cancel}" Clicked="OnCancelClicked">
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="FontAwesomeRegular"
@@ -37,7 +45,10 @@
                     <CheckBox x:Name="pwCheckBox" 
                               Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Secondary}}" 
                               CheckedChanged="OnPasswordCheckBoxChanged" />
-                </StackLayout>
+                    <Label Text="OTP"/>
+                    <CheckBox x:Name="otpCheckBox" Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Secondary}}"  
+                          CheckedChanged="OnOtpCheckBoxChanged" />
+            </StackLayout>
                 <!-- Notes -->
                 <ScrollView VerticalOptions="FillAndExpand">
                     <StackLayout>

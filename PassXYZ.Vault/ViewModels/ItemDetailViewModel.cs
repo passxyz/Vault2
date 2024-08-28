@@ -180,6 +180,10 @@ public partial class ItemDetailViewModel : BaseViewModel
                 Fields.Add(field);
                 await dataStore.UpdateItemAsync(_item);
             }
+            if(k.Contains(PassXYZLib.PxDefs.PxCustomDataOtpUrl) && _item != null)
+            {
+                await dataStore.UpdateItemAsync(_item);
+            }
         }, _item));
     }
 
