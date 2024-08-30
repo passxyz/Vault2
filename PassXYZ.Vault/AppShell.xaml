@@ -9,14 +9,23 @@
        FlyoutBackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Primary}}">
 
     <TabBar>
-        <ShellContent Title="Login" Route="LoginPage" 
+        <Tab Title="{x:Static res:Resources.action_id_login}" 
+             Icon="{FontImage FontFamily=FontAwesomeSolid, Color=Black,
+             Glyph={x:Static style:FontAwesomeSolid.UserLock}}">
+            <ShellContent Title="Login" Route="LoginPage" 
                       Icon="{FontImage FontFamily=FontAwesomeSolid, Color=Black,
                       Glyph={x:Static style:FontAwesomeSolid.UserAlt}}"
                       ContentTemplate="{DataTemplate local:LoginPage}" />
-        <ShellContent Title="SignUp" Route="SignUpPage" 
+
+        </Tab>
+        <Tab Title="{x:Static res:Resources.menu_id_users}" 
+             Icon="{FontImage FontFamily=FontAwesomeSolid, Color=Black,
+             Glyph={x:Static style:FontAwesomeSolid.UserCog}}">
+            <ShellContent Title="SignUp" Route="UsersPage" 
                       Icon="{FontImage FontFamily=FontAwesomeSolid, Color=Black,
                       Glyph={x:Static style:FontAwesomeSolid.Users}}"
-                      ContentTemplate="{DataTemplate local:SignUpPage}" />
+                      ContentTemplate="{DataTemplate local:UsersPage}" />
+        </Tab>
     </TabBar>
 
     <FlyoutItem Title="{x:Static res:Resources.menu_id_help}"

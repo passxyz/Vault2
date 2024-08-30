@@ -8,12 +8,14 @@ using PassXYZLib;
 using PassXYZ.Vault.Views;
 using PassXYZ.Vault.Services;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
 
 namespace PassXYZ.Vault.ViewModels
 {
     public partial class LoginViewModel : ObservableObject
     {
         private LoginService _currentUser;
+        public ObservableCollection<PxUser> Users { get; }
         ILogger<LoginViewModel> _logger;
         private readonly IFingerprint _fingerprint;
 
@@ -22,6 +24,7 @@ namespace PassXYZ.Vault.ViewModels
             _currentUser = user;
             _logger = logger;
             _fingerprint = fingerprint;
+            Users = new ObservableCollection<PxUser>();
         }
 
         [RelayCommand(CanExecute = nameof(ValidateLogin))]
@@ -104,6 +107,7 @@ namespace PassXYZ.Vault.ViewModels
 
                 await _currentUser.SignUpAsync();
                 await Shell.Current.DisplayAlert(Properties.Resources.SignUpPageTitle, Properties.Resources.SiguUpMessage, Properties.Resources.alert_id_ok);
+                Users.Add(_currentUser);
                 Username = "";
                 Password = "";
                 Password2 = "";
@@ -114,6 +118,7 @@ namespace PassXYZ.Vault.ViewModels
                 await Shell.Current.DisplayAlert(Properties.Resources.SignUpPageTitle, ex.Message, Properties.Resources.alert_id_ok);
             }
             Debug.WriteLine($"LoginViewModel: OnSignUpClicked {_currentUser.Username}, DeviceLock: {_currentUser.IsDeviceLockEnabled}");
+            await Shell.Current.Navigation.PopModalAsync();
         }
 
         private bool ValidateSignUp()
@@ -285,6 +290,73 @@ namespace PassXYZ.Vault.ViewModels
         public string GetDeviceLockData()
         {
             return PxDatabase.GetDeviceLockData(_currentUser);
+        }
+
+        [RelayCommand]
+        private async Task AddUser(object obj)
+        {
+            await Shell.Current.Navigation.PushModalAsync(new SignUpPage(this));
+        }
+
+        [RelayCommand]
+        private async Task LoadUsers()
+        {
+            if (IsBusy)
+            {
+                _logger.LogDebug("It is busy and cannot load users");
+                return;
+            }
+
+            try 
+            {
+                IsBusy = true;
+                var users = await PxUser.LoadLocalUsersAsync();
+                if (users == null)
+                {
+                    _logger.LogDebug("LoadUsersCommand, users is null");
+                    IsBusy = false;
+                    throw new ArgumentNullException(nameof(users));
+                }
+
+                Users.Clear();
+                foreach (var user in users)
+                {
+                    Users.Add(user);
+                }
+                IsBusy = false;
+                _logger.LogDebug("LoadUsersCommand done");
+            }
+            catch (Exception ex)
+            {
+                IsBusy = false;
+                _logger.LogError(ex, "LoadUsersCommand error");
+            }
+        }
+
+        [RelayCommand]
+        public void DeleteUser(User user)
+        {
+            if (IsBusy)
+            {
+                _logger.LogDebug($"It is busy and cannot delete {user.Username}");
+                return;
+            }
+
+            IsBusy = true;
+            user.Delete();
+            Users.Remove((PxUser)user);
+
+            IsBusy = false;
+            _logger.LogDebug($"Delete {user.Username}");
+        }
+
+        public void OnUserSelected(User user)
+        {
+            if (_currentUser != null)
+            {
+                _currentUser.Username = user.Username;
+            }
+            _logger.LogDebug($"Selected user {user.Username}.");
         }
     }
 }
