@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 
-using Plugin.Fingerprint;
 using Plugin.Fingerprint.Abstractions;
 using PassXYZLib;
 using PassXYZ.Vault.Views;
@@ -135,8 +134,38 @@ namespace PassXYZ.Vault.ViewModels
             return canExecute;
         }
 
-        [RelayCommand(CanExecute = nameof(ValidateFingerprintLogin))]
-        private async Task FingerprintLogin()
+        public async void ImportKeyFile()
+        {
+            var options = new PickOptions
+            {
+                PickerTitle = Properties.Resources.import_message1,
+                //FileTypes = customFileType,
+            };
+
+            try
+            {
+                var result = await FilePicker.PickAsync(options);
+                if (result != null)
+                {
+                    var stream = await result.OpenReadAsync();
+                    var fileStream = File.Create(_currentUser.KeyFilePath);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    stream.CopyTo(fileStream);
+                    fileStream.Close();
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert(Properties.Resources.action_id_import, Properties.Resources.import_error_msg, Properties.Resources.alert_id_ok);
+                }
+            }
+            catch (Exception ex)
+            {
+                // The user canceled or something went wrong
+                _logger.LogError($"LoginViewModel: ImportKeyFile, {ex}");
+            }
+        }
+
+        public async Task FingerprintLogin()
         {
             var cancel = new CancellationTokenSource();
             var dialogConfig = new AuthenticationRequestConfiguration(Username,
@@ -168,12 +197,6 @@ namespace PassXYZ.Vault.ViewModels
             }
         }
 
-        private bool ValidateFingerprintLogin()
-        {
-            CheckFingerprintStatus();
-            return !String.IsNullOrWhiteSpace(Username);
-        }
-
         public async void CheckFingerprintStatus()
         {
             _currentUser.Username = Username;
@@ -202,7 +225,7 @@ namespace PassXYZ.Vault.ViewModels
                     _currentUser.Username = value;
                     LoginCommand.NotifyCanExecuteChanged();
                     SignUpCommand.NotifyCanExecuteChanged();
-                    FingerprintLoginCommand.NotifyCanExecuteChanged();
+                    _logger.LogDebug($"set to user {_currentUser.Username}");
                 }
             }
         }
@@ -233,6 +256,7 @@ namespace PassXYZ.Vault.ViewModels
             {
                 // This is important, since we need to reset device lock status based on existing file.
                 _currentUser.IsDeviceLockEnabled = user.IsDeviceLockEnabled;
+                _logger.LogDebug($"Checking device lock is {!_currentUser.IsKeyFileExist && _currentUser.IsDeviceLockEnabled}");
                 return !_currentUser.IsKeyFileExist && _currentUser.IsDeviceLockEnabled;
             }
 
@@ -247,13 +271,18 @@ namespace PassXYZ.Vault.ViewModels
         {
             get
             {
+                CheckDeviceLock();
                 return _currentUser.IsDeviceLockEnabled;
             }
+        }
 
-            set
+        public bool IsKeyFileNotExist
+        { 
+            get 
             {
-                _currentUser.IsDeviceLockEnabled = value;
-            }
+                _logger.LogDebug($"user={_currentUser.Username}, IsDeviceLockEnabled={_currentUser.IsDeviceLockEnabled}, IsKeyFileExist={_currentUser.IsKeyFileExist}");
+                return (IsDeviceLockEnabled && !_currentUser.IsKeyFileExist);
+            } 
         }
 
         public List<string> GetUsersList()
@@ -357,6 +386,16 @@ namespace PassXYZ.Vault.ViewModels
                 _currentUser.Username = user.Username;
             }
             _logger.LogDebug($"Selected user {user.Username}.");
+        }
+
+        /// <summary>
+        /// Recreate a key file from a PxKeyData
+        /// </summary>
+        /// <param name="data">PxKeyData source</param>
+        /// <returns>true - created key file, false - failed to create key file.</returns>
+        public bool CreateKeyFile(string data)
+        {
+            return PxDatabase.CreateKeyFile(data, _currentUser.Username);
         }
     }
 }

@@ -76,7 +76,7 @@
                                    Grid.Row="1" Grid.Column="1" />
                     <ImageButton x:Name="fpButton" Grid.Row="1" Grid.Column="2" 
                                     VerticalOptions="End" IsVisible="{Binding IsFingerprintEnabled}"
-                                    Command="{Binding FingerprintLoginCommand}" 
+                                    Clicked="OnFingerprintClicked" 
                                     BackgroundColor="White" BorderColor="White"
                                     HeightRequest="32"  WidthRequest="32" BorderWidth="0">
                         <ImageButton.Source>
