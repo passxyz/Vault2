@@ -247,6 +247,13 @@ namespace PassXYZ.Vault.ViewModels
 
         private bool CheckDeviceLock()
         {
+            if (string.IsNullOrWhiteSpace(this.Username)) 
+            {
+                // When username is empty in LoginPage, we need to set this.
+                IsDeviceLockEnabled = false;
+                return false;
+            }
+
             User user = new()
             {
                 Username = this.Username,
@@ -273,6 +280,11 @@ namespace PassXYZ.Vault.ViewModels
             {
                 CheckDeviceLock();
                 return _currentUser.IsDeviceLockEnabled;
+            }
+            set 
+            {
+                // This is needed by SignUpPage.
+                _currentUser.IsDeviceLockEnabled = value;
             }
         }
 
@@ -318,7 +330,7 @@ namespace PassXYZ.Vault.ViewModels
 
         public string GetDeviceLockData()
         {
-            return PxDatabase.GetDeviceLockData(_currentUser);
+            return (PxDefs.PxKeyFile + PxDatabase.GetDeviceLockData(_currentUser));
         }
 
         [RelayCommand]

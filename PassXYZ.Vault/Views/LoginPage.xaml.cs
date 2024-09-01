@@ -91,12 +91,15 @@ namespace PassXYZ.Vault.Views
             // Stop scanning
             // scanPage.IsScanning = false;
             bool updateUI = false;
+            Debug.WriteLine("Processing key file data ...");
 
             if (result.Text.StartsWith(PxDefs.PxKeyFile))
             {
-                if (_viewModel.CreateKeyFile(result.Text))
+                string data = result.Text.Substring(PxDefs.PxKeyFile.Length);
+                if (_viewModel.CreateKeyFile(data))
                 {
                     updateUI = true;
+                    Debug.WriteLine("Key file created.");
                 }
                 else
                 {
@@ -111,6 +114,7 @@ namespace PassXYZ.Vault.Views
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 await Navigation.PopAsync();
+                Debug.WriteLine("Return to login page.");
                 if (updateUI)
                 {
                     fpButton.Source = new FontImageSource
