@@ -2,18 +2,19 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 
-using Plugin.Fingerprint;
 using Plugin.Fingerprint.Abstractions;
 using PassXYZLib;
 using PassXYZ.Vault.Views;
 using PassXYZ.Vault.Services;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
 
 namespace PassXYZ.Vault.ViewModels
 {
     public partial class LoginViewModel : ObservableObject
     {
         private LoginService _currentUser;
+        public ObservableCollection<PxUser> Users { get; }
         ILogger<LoginViewModel> _logger;
         private readonly IFingerprint _fingerprint;
 
@@ -22,6 +23,7 @@ namespace PassXYZ.Vault.ViewModels
             _currentUser = user;
             _logger = logger;
             _fingerprint = fingerprint;
+            Users = new ObservableCollection<PxUser>();
         }
 
         [RelayCommand(CanExecute = nameof(ValidateLogin))]
@@ -104,6 +106,7 @@ namespace PassXYZ.Vault.ViewModels
 
                 await _currentUser.SignUpAsync();
                 await Shell.Current.DisplayAlert(Properties.Resources.SignUpPageTitle, Properties.Resources.SiguUpMessage, Properties.Resources.alert_id_ok);
+                Users.Add(_currentUser);
                 Username = "";
                 Password = "";
                 Password2 = "";
@@ -114,6 +117,7 @@ namespace PassXYZ.Vault.ViewModels
                 await Shell.Current.DisplayAlert(Properties.Resources.SignUpPageTitle, ex.Message, Properties.Resources.alert_id_ok);
             }
             Debug.WriteLine($"LoginViewModel: OnSignUpClicked {_currentUser.Username}, DeviceLock: {_currentUser.IsDeviceLockEnabled}");
+            await Shell.Current.Navigation.PopModalAsync();
         }
 
         private bool ValidateSignUp()
@@ -130,8 +134,38 @@ namespace PassXYZ.Vault.ViewModels
             return canExecute;
         }
 
-        [RelayCommand(CanExecute = nameof(ValidateFingerprintLogin))]
-        private async Task FingerprintLogin()
+        public async void ImportKeyFile()
+        {
+            var options = new PickOptions
+            {
+                PickerTitle = Properties.Resources.import_message1,
+                //FileTypes = customFileType,
+            };
+
+            try
+            {
+                var result = await FilePicker.PickAsync(options);
+                if (result != null)
+                {
+                    var stream = await result.OpenReadAsync();
+                    var fileStream = File.Create(_currentUser.KeyFilePath);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    stream.CopyTo(fileStream);
+                    fileStream.Close();
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert(Properties.Resources.action_id_import, Properties.Resources.import_error_msg, Properties.Resources.alert_id_ok);
+                }
+            }
+            catch (Exception ex)
+            {
+                // The user canceled or something went wrong
+                _logger.LogError($"LoginViewModel: ImportKeyFile, {ex}");
+            }
+        }
+
+        public async Task FingerprintLogin()
         {
             var cancel = new CancellationTokenSource();
             var dialogConfig = new AuthenticationRequestConfiguration(Username,
@@ -163,18 +197,20 @@ namespace PassXYZ.Vault.ViewModels
             }
         }
 
-        private bool ValidateFingerprintLogin()
-        {
-            CheckFingerprintStatus();
-            return !String.IsNullOrWhiteSpace(Username);
-        }
+        public delegate void FingerPrintStatusChangedHandler(object sender, EventArgs e);
 
-        public async void CheckFingerprintStatus()
+        // Event for notifying stock price changes
+        public event FingerPrintStatusChangedHandler FingerPrintStatusChanged;
+
+        public async Task CheckFingerprintStatus()
         {
             _currentUser.Username = Username;
             var password = await _currentUser.GetSecurityAsync();
             IsFingerprintAvailable = await _fingerprint.IsAvailableAsync();
             IsFingerprintEnabled = IsFingerprintAvailable && !string.IsNullOrWhiteSpace(password);
+            _logger.LogDebug($"IsFingerprintEnabled = {IsFingerprintEnabled}");
+            EventArgs eventArgs = new EventArgs();
+            FingerPrintStatusChanged?.Invoke(this, eventArgs);
         }
 
         [ObservableProperty]
@@ -197,7 +233,8 @@ namespace PassXYZ.Vault.ViewModels
                     _currentUser.Username = value;
                     LoginCommand.NotifyCanExecuteChanged();
                     SignUpCommand.NotifyCanExecuteChanged();
-                    FingerprintLoginCommand.NotifyCanExecuteChanged();
+                    var t = CheckFingerprintStatus();
+                    _logger.LogDebug($"set to user {_currentUser.Username} {t.IsCompletedSuccessfully}");
                 }
             }
         }
@@ -219,6 +256,13 @@ namespace PassXYZ.Vault.ViewModels
 
         private bool CheckDeviceLock()
         {
+            if (string.IsNullOrWhiteSpace(this.Username)) 
+            {
+                // When username is empty in LoginPage, we need to set this.
+                IsDeviceLockEnabled = false;
+                return false;
+            }
+
             User user = new()
             {
                 Username = this.Username,
@@ -228,6 +272,7 @@ namespace PassXYZ.Vault.ViewModels
             {
                 // This is important, since we need to reset device lock status based on existing file.
                 _currentUser.IsDeviceLockEnabled = user.IsDeviceLockEnabled;
+                _logger.LogDebug($"Checking device lock is {!_currentUser.IsKeyFileExist && _currentUser.IsDeviceLockEnabled}");
                 return !_currentUser.IsKeyFileExist && _currentUser.IsDeviceLockEnabled;
             }
 
@@ -242,13 +287,23 @@ namespace PassXYZ.Vault.ViewModels
         {
             get
             {
+                CheckDeviceLock();
                 return _currentUser.IsDeviceLockEnabled;
             }
-
-            set
+            set 
             {
+                // This is needed by SignUpPage.
                 _currentUser.IsDeviceLockEnabled = value;
             }
+        }
+
+        public bool IsKeyFileNotExist
+        { 
+            get 
+            {
+                _logger.LogDebug($"user={_currentUser.Username}, IsDeviceLockEnabled={_currentUser.IsDeviceLockEnabled}, IsKeyFileExist={_currentUser.IsKeyFileExist}");
+                return (IsDeviceLockEnabled && !_currentUser.IsKeyFileExist && _currentUser.IsUserExist);
+            } 
         }
 
         public List<string> GetUsersList()
@@ -280,6 +335,88 @@ namespace PassXYZ.Vault.ViewModels
             var result = await _fingerprint.AuthenticateAsync(dialogConfig, cancelToken.Token);
 
             return result.Authenticated;
+        }
+
+        public string GetDeviceLockData()
+        {
+            return (PxDefs.PxKeyFile + PxDatabase.GetDeviceLockData(_currentUser));
+        }
+
+        [RelayCommand]
+        private async Task AddUser(object obj)
+        {
+            await Shell.Current.Navigation.PushModalAsync(new SignUpPage(this));
+        }
+
+        [RelayCommand]
+        private async Task LoadUsers()
+        {
+            if (IsBusy)
+            {
+                _logger.LogDebug("It is busy and cannot load users");
+                return;
+            }
+
+            try 
+            {
+                IsBusy = true;
+                var users = await PxUser.LoadLocalUsersAsync();
+                if (users == null)
+                {
+                    _logger.LogDebug("LoadUsersCommand, users is null");
+                    IsBusy = false;
+                    throw new ArgumentNullException(nameof(users));
+                }
+
+                Users.Clear();
+                foreach (var user in users)
+                {
+                    Users.Add(user);
+                }
+                IsBusy = false;
+                _logger.LogDebug("LoadUsersCommand done");
+            }
+            catch (Exception ex)
+            {
+                IsBusy = false;
+                _logger.LogError(ex, "LoadUsersCommand error");
+            }
+        }
+
+        [RelayCommand]
+        public void DeleteUser(User user)
+        {
+            if (IsBusy)
+            {
+                _logger.LogDebug($"It is busy and cannot delete {user.Username}");
+                return;
+            }
+
+            IsBusy = true;
+            user.Delete();
+            Users.Remove((PxUser)user);
+
+            IsBusy = false;
+            _logger.LogDebug($"Delete {user.Username}");
+        }
+
+        public void OnUserSelected(User user)
+        {
+            if (_currentUser != null)
+            {
+                _currentUser.Username = user.Username;
+            }
+            _logger.LogDebug($"Selected user {user.Username}.");
+        }
+
+        /// <summary>
+        /// Recreate a key file from a PxKeyData
+        /// </summary>
+        /// <param name="data">PxKeyData source</param>
+        /// <returns>true - created key file, false - failed to create key file.</returns>
+        public bool CreateKeyFile(string data)
+        {
+            return PxDatabase.CreateKeyFile(data, _currentUser.Username);
         }
     }
 }

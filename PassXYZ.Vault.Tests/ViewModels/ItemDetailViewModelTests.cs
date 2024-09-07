@@ -15,14 +15,15 @@ namespace PassXYZ.Vault.Tests.ViewModels
         public ItemDetailViewModelTests() 
         {
             using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
-                builder.AddConsole()
+                builder.AddConsole().AddDebug()
                 .SetMinimumLevel(LogLevel.Debug));
             logger = loggerFactory.CreateLogger<ItemDetailViewModel>();
             dataStore = new DataStore();
+            logger.LogInformation("Start ItemDetailViewModel Tests");
         }
 
         [Fact]
-        public async void LoadItemIdTests()
+        public async Task LoadItemIdTests()
         {
             // Arrange
             ItemDetailViewModel vm = new(dataStore, logger);
@@ -40,7 +41,7 @@ namespace PassXYZ.Vault.Tests.ViewModels
         }
 
         [Fact]
-        public async void SetItemIdTests()
+        public async Task SetItemIdTests()
         {
             // Arrange
             ItemDetailViewModel vm = new(dataStore, logger);

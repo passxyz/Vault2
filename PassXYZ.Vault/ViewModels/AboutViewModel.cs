@@ -40,5 +40,9 @@ namespace PassXYZ.Vault.ViewModels
             return DateTime.Now;
         }
 
+        public string GetDataPath() 
+        {
+            return _currentUser.Path;
+        }
     }
 }

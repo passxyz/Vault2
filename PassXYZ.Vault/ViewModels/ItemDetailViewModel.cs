@@ -27,6 +27,7 @@ public partial class ItemDetailViewModel : BaseViewModel
         this.dataStore = dataStore;
         this.logger = logger;
         Fields = new ObservableCollection<Field>();
+        IsBusy = false;
     }
 
     [ObservableProperty]
@@ -177,6 +178,10 @@ public partial class ItemDetailViewModel : BaseViewModel
             if (field != null && _item != null)
             {
                 Fields.Add(field);
+                await dataStore.UpdateItemAsync(_item);
+            }
+            if(k.Contains(PassXYZLib.PxDefs.PxCustomDataOtpUrl) && _item != null)
+            {
                 await dataStore.UpdateItemAsync(_item);
             }
         }, _item));

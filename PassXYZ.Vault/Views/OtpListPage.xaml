@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:local="clr-namespace:PassXYZ.Vault.ViewModels"
+             xmlns:lib="clr-namespace:PassXYZLib;assembly=PassXYZLib"
+             x:DataType="local:OtpListViewModel"
+             x:Class="PassXYZ.Vault.Views.OtpListPage">
+    <ContentPage.Content>
+        <RefreshView x:DataType="local:OtpListViewModel" Command="{Binding GetOtpListCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+            <ListView x:Name="OtpListView" 
+                ItemsSource="{Binding Entries}"
+                VerticalOptions="FillAndExpand"
+                HasUnevenRows="true"
+                IsPullToRefreshEnabled="true"
+                ItemSelected="OnItemSelected">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Padding="10" Orientation="Horizontal" HorizontalOptions="Fill"  x:DataType="lib:PxEntry" >
+                                <Grid >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="32" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image Grid.Column="0" Source="{Binding ImgSource}" HorizontalOptions="Fill" VerticalOptions="Fill" />
+                                </Grid>
+                                <StackLayout Padding="10">
+                                    <Label Text="{Binding Name}" 
+                                           LineBreakMode="TailTruncation" 
+                                           Style="{DynamicResource Value}" 
+                                           FontSize="Small" />
+                                    <Label Text="{Binding Token}" 
+                                           LineBreakMode="TailTruncation" 
+                                           Style="{DynamicResource Key}" 
+                                           FontSize="Large" />
+                                    <ProgressBar x:Name="OtpTokenProgressBar" Progress="{Binding Progress}" HeightRequest="5" />
+                                    <Label Text="{Binding TotpDescription}" 
+                                           Style="{DynamicResource Value}" 
+                                           FontSize="Small">
+                                        <Label.LineBreakMode>
+                                            <OnPlatform x:TypeArguments="LineBreakMode">
+                                                <On Platform="iOS" Value="TailTruncation" />
+                                                <On Platform="Android" Value="TailTruncation" />
+                                                <On Platform="UWP" Value="NoWrap" />
+                                            </OnPlatform>
+                                        </Label.LineBreakMode>
+                                    </Label>
+                                </StackLayout>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </RefreshView>
+    </ContentPage.Content>
+</ContentPage>

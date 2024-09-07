@@ -21,6 +21,7 @@ namespace PassXYZ.Vault.Views
             DateTime localTime = _viewModel.GetStoreModifiedTime().ToLocalTime();
             LastModifiedDate.Text = localTime.ToLongDateString();
             LastModifiedTime.Text = localTime.ToLongTimeString();
+            DataPath.Text = _viewModel.GetDataPath();
 
             var assemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             var version = Properties.Resources.Version + " " + ((assemblyVersion != null) ? assemblyVersion.ToString() : "");

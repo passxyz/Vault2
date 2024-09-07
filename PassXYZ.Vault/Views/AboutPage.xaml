@@ -26,6 +26,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -40,6 +41,9 @@
                     <!-- Row 3 (Last Modified Time) -->
                     <Label HorizontalOptions="End" FontSize="Small" Text="{x:Static resources:Resources.database_modified_time}" FontAttributes="Bold" Grid.Row="2" Grid.Column="0" />
                     <Label HorizontalOptions="Start" Padding="10,0,0,0" FontSize="Small" x:Name="LastModifiedTime" Grid.Row="2" Grid.Column="1" />
+                    <!-- Row 4 (Path) -->
+                    <Label HorizontalOptions="End" FontSize="Small" Text="{x:Static resources:Resources.user_id_local}" FontAttributes="Bold" Grid.Row="3" Grid.Column="0" />
+                    <Label HorizontalOptions="Start" Padding="10,0,0,0" FontSize="Small" x:Name="DataPath" Grid.Row="3" Grid.Column="1" />
                 </Grid>
 
                 <StackLayout Margin="20">

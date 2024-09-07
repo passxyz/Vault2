@@ -34,5 +34,7 @@
     <string>PassXYZ.Vault2</string>
 	<key>NSFaceIDUsageDescription</key>
     <string>Need your face to unlock secrets!</string>
+    <key>NSCameraUsageDescription</key>
+    <string>This app uses camera for scan QrCode</string>
 </dict>
 </plist>
