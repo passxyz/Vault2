@@ -197,12 +197,20 @@ namespace PassXYZ.Vault.ViewModels
             }
         }
 
-        public async void CheckFingerprintStatus()
+        public delegate void FingerPrintStatusChangedHandler(object sender, EventArgs e);
+
+        // Event for notifying stock price changes
+        public event FingerPrintStatusChangedHandler FingerPrintStatusChanged;
+
+        public async Task CheckFingerprintStatus()
         {
             _currentUser.Username = Username;
             var password = await _currentUser.GetSecurityAsync();
             IsFingerprintAvailable = await _fingerprint.IsAvailableAsync();
             IsFingerprintEnabled = IsFingerprintAvailable && !string.IsNullOrWhiteSpace(password);
+            _logger.LogDebug($"IsFingerprintEnabled = {IsFingerprintEnabled}");
+            EventArgs eventArgs = new EventArgs();
+            FingerPrintStatusChanged?.Invoke(this, eventArgs);
         }
 
         [ObservableProperty]
@@ -225,7 +233,8 @@ namespace PassXYZ.Vault.ViewModels
                     _currentUser.Username = value;
                     LoginCommand.NotifyCanExecuteChanged();
                     SignUpCommand.NotifyCanExecuteChanged();
-                    _logger.LogDebug($"set to user {_currentUser.Username}");
+                    var t = CheckFingerprintStatus();
+                    _logger.LogDebug($"set to user {_currentUser.Username} {t.IsCompletedSuccessfully}");
                 }
             }
         }
@@ -293,7 +302,7 @@ namespace PassXYZ.Vault.ViewModels
             get 
             {
                 _logger.LogDebug($"user={_currentUser.Username}, IsDeviceLockEnabled={_currentUser.IsDeviceLockEnabled}, IsKeyFileExist={_currentUser.IsKeyFileExist}");
-                return (IsDeviceLockEnabled && !_currentUser.IsKeyFileExist);
+                return (IsDeviceLockEnabled && !_currentUser.IsKeyFileExist && _currentUser.IsUserExist);
             } 
         }
 

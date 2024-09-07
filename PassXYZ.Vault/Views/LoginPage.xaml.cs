@@ -3,6 +3,7 @@ using PassXYZ.Vault.ViewModels;
 using System.Diagnostics;
 using PassXYZ.Vault.Resources.Styles;
 using Camera.MAUI;
+using Microsoft.Extensions.Logging;
 
 namespace PassXYZ.Vault.Views
 {
@@ -10,16 +11,19 @@ namespace PassXYZ.Vault.Views
     public partial class LoginPage : ContentPage
     {
         private readonly LoginViewModel _viewModel;
+        ILogger<LoginPage> _logger;
         private List<string> _users => User.GetUsersList();
 
-        public LoginPage(LoginViewModel viewModel)
+        public LoginPage(LoginViewModel viewModel, ILogger<LoginPage> logger)
         {
             InitializeComponent();
             BindingContext = _viewModel = viewModel;
+            _logger = logger;
             if (_users != null && _users.Count > 1)
             {
                 switchUsersButton.IsVisible = true;
             }
+            _viewModel.FingerPrintStatusChanged += FingerPrintStatusChanged;
         }
 
         private async void OnSwitchUsersClicked(object sender, EventArgs e)
@@ -27,7 +31,7 @@ namespace PassXYZ.Vault.Views
             if (_users != null)
             {
                 var username = await DisplayActionSheet(Properties.Resources.pt_id_switchusers, Properties.Resources.action_id_cancel, null, _users.ToArray());
-                if (username != Properties.Resources.action_id_cancel)
+                if (username != Properties.Resources.action_id_cancel && !string.IsNullOrWhiteSpace(username))
                 {
                     messageLabel.Text = "";
                     _viewModel.Username = usernameEntry.Text = username;
@@ -42,46 +46,74 @@ namespace PassXYZ.Vault.Views
             base.OnAppearing();
             _viewModel.Logout();
             passwordEntry.Text = "";
-            _viewModel.CheckFingerprintStatus();
             InitFingerPrintButton();
         }
 
-        private void InitFingerPrintButton()
+        private void FingerPrintStatusChanged(object sender, EventArgs e)
+        {
+            _logger.LogDebug($"Fingerprint status changed {_viewModel.IsFingerprintEnabled}");
+            if (_viewModel.IsKeyFileNotExist)
+            {
+                Debug.WriteLine("LoginPage: SetupQRCode");
+                SetToQrCode();
+            }
+            else
+            {
+                bool isVisible = false;
+                if (_viewModel.IsFingerprintEnabled)
+                {
+                    isVisible = true;
+                }
+                SetToFingerprint(isVisible);
+            }
+        }
+
+        private void SetToQrCode() 
+        {
+            fpButton.Source = new FontImageSource
+            {
+                Glyph = FontAwesomeSolid.Qrcode,
+                FontFamily = "FontAwesomeSolid",
+                Color = (Color)Application.Current.Resources["Primary"],
+                Size = 32
+            };
+            // fpButton.Clicked += OnScanQRCodeClicked;
+            fpButton.IsVisible = true;
+            passwordEntry.IsEnabled = false;
+            messageLabel.Text = Properties.Resources.settings_security_DLK_message1 + _viewModel.Username + ".";
+        }
+
+        private void SetToFingerprint(bool isVisible = false)
+        {
+            fpButton.IsVisible = isVisible;
+            passwordEntry.IsEnabled = true;
+            messageLabel.Text = "";
+            fpButton.Source = new FontImageSource
+            {
+                Glyph = FontAwesomeSolid.Fingerprint,
+                FontFamily = "FontAwesomeSolid",
+                Color = (Color)Application.Current.Resources["Primary"],
+                Size = 32
+            };
+        }
+
+        private async void InitFingerPrintButton()
         {
             // if device lock is enabled, but key file doesn't exist
             if (_viewModel.IsKeyFileNotExist)
             {
                 Debug.WriteLine("LoginPage: SetupQRCode");
-
-                fpButton.Source = new FontImageSource
-                {
-                    Glyph = FontAwesomeSolid.Qrcode,
-                    FontFamily = "FontAwesomeSolid",
-                    Color = (Color)Application.Current.Resources["Primary"],
-                    Size = 32
-                };
-                // fpButton.Clicked += OnScanQRCodeClicked;
-                fpButton.IsVisible = true;
-                passwordEntry.IsEnabled = false;
-                messageLabel.Text = Properties.Resources.settings_security_DLK_message1 + _viewModel.Username + ".";
+                SetToQrCode();
             }
             else
             {
-                fpButton.IsVisible = false;
-                passwordEntry.IsEnabled = true;
-                messageLabel.Text = "";
-                fpButton.Source = new FontImageSource
-                {
-                    Glyph = FontAwesomeSolid.Fingerprint,
-                    FontFamily = "FontAwesomeSolid",
-                    Color = (Color)Application.Current.Resources["Primary"],
-                    Size = 32
-                };
-
+                await _viewModel.CheckFingerprintStatus();
+                bool isVisible = false;
                 if (_viewModel.IsFingerprintEnabled)
                 {
-                    fpButton.IsVisible = true;
+                    isVisible = true;
                 }
+                SetToFingerprint(isVisible);
             }
         }
 
@@ -117,16 +149,7 @@ namespace PassXYZ.Vault.Views
                 Debug.WriteLine("Return to login page.");
                 if (updateUI)
                 {
-                    fpButton.Source = new FontImageSource
-                    {
-                        Glyph = FontAwesomeSolid.Fingerprint,
-                        FontFamily = "FontAwesomeSolid",
-                        Color = (Color)Application.Current.Resources["Primary"],
-                        Size = 32
-                    };
-                    fpButton.IsVisible = false;
-                    passwordEntry.IsEnabled = true;
-                    messageLabel.Text = " ";
+                    SetToFingerprint(false);
                 }
 
                 await DisplayAlert(Properties.Resources.settings_security_scan_result, info, Properties.Resources.alert_id_ok);
@@ -164,16 +187,7 @@ namespace PassXYZ.Vault.Views
 
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    fpButton.IsVisible = false;
-                    passwordEntry.IsEnabled = true;
-                    messageLabel.Text = "";
-                    fpButton.Source = new FontImageSource
-                    {
-                        Glyph = FontAwesomeSolid.Fingerprint,
-                        FontFamily = "FontAwesomeSolid",
-                        Color = (Color)Application.Current.Resources["Primary"],
-                        Size = 32
-                    };
+                    SetToFingerprint(false);
                 });
             }
             else
