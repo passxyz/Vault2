@@ -20,7 +20,7 @@
                      Glyph={x:Static style:FontAwesomeSolid.PlusCircle}}"/>
     </ContentPage.ToolbarItems>
 
-    <RefreshView Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+    <RefreshView Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=OneWay}">
         <ScrollView>
             <ListView x:Name="itemsListView"
                   ItemsSource="{Binding Items}"

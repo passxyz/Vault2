@@ -31,7 +31,7 @@ public partial class App : Application
     {
         InBackground = false;
         IsSshOperationTimeout = false;
-        InitTestDb();
+        //InitTestDb();
         ExtractIcons();
     }
 
